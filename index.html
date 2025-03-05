@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调用 Polygon 智能合约</title>
+</head>
+<body>
+    <h1>调用智能合约 (Polygon)</h1>
+    <button id="connectButton">连接钱包</button>
+    <button id="callButton">调用 sayHello</button>
+    <p>合约返回结果：<span id="result">未调用</span></p>
+
+    <!-- 更换为 unpkg 的 ethers.js CDN -->
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="text/javascript"></script>
+    <script>
+        // 你的合约地址
+        const contractAddress = "0x7e5B0BCd1a39E40C2fa4e256b4e62Ca923FCFD7A";
+
+        // 假设的合约 ABI
+        const contractABI = [
+            {
+                "inputs": [],
+                "name": "sayHello",
+                "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+                "stateMutability": "pure",
+                "type": "function"
+            }
+        ];
+
+        let provider;
+        let contract;
+
+        // 连接钱包函数
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: "eth_requestAccounts" });
+                    await window.ethereum.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x89" }],
+                    });
+                    provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                    contract = new ethers.Contract(contractAddress, contractABI, provider);
+                    console.log("已连接到 Polygon 网络");
+                    alert("钱包已连接到 Polygon！");
+                } catch (error) {
+                    if (error.code === 4001) {
+                        alert("你拒绝了钱包连接请求，请授权连接后再试！");
+                    } else if (error.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: "wallet_addEthereumChain",
+                                params: [{
+                                    chainId: "0x89",
+                                    chainName: "Polygon Mainnet",
+                                    rpcUrls: ["https://polygon-rpc.com"],
+                                    nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
+                                    blockExplorerUrls: ["https://polygonscan.com/"]
+                                }]
+                            });
+                            provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                            contract = new ethers.Contract(contractAddress, contractABI, provider);
+                            alert("Polygon 网络已添加并连接！");
+                        } catch (addError) {
+                            console.error("添加 Polygon 网络失败:", addError);
+                            alert("添加 Polygon 网络失败");
+                        }
+                    } else {
+                        console.error("连接钱包或切换网络失败:", error);
+                        alert("连接失败，请检查 MetaMask 和网络");
+                    }
+                }
+            } else {
+                alert("请安装 MetaMask！");
+            }
+        }
+
+        // 调用 sayHello 函数
+        async function callHello() {
+            if (!contract) {
+                alert("请先连接钱包！");
+                return;
+            }
+            try {
+                const result = await contract.sayHello();
+                document.getElementById("result").innerText = result;
+                console.log("合约返回:", result);
+            } catch (error) {
+                console.error("调用失败:", error);
+                alert("调用失败，可能是 ABI 不匹配或网络问题");
+            }
+        }
+
+        // 绑定按钮事件
+        document.getElementById("connectButton").addEventListener("click", connectWallet);
+        document.getElementById("callButton").addEventListener("click", callHello);
+    </script>
+</body>
+</html>
