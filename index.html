@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>调用 Polygon 智能合约</title>
+    <title>Polygon スマートコントラクトの呼び出し</title>
 </head>
 <body>
-    <h1>调用智能合约 (Polygon)</h1>
-    <button id="connectButton">连接钱包</button>
-    <button id="callButton">调用 sayHello</button>
-    <p>合约返回结果：<span id="result">未调用</span></p>
-
-    <!-- 更换为 unpkg 的 ethers.js CDN -->
+    <h1>スマートコントラクトの呼び出し (Polygon)</h1>
+    <button id="connectButton">ウォレットを接続</button>
+    <button id="callButton">sayHelloを呼び出す</button>
+    <p>コントラクトの返結果：<span id="result">未呼び出し</span></p>
+    <!-- unpkg の ethers.js CDN に変更 -->
     <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js" type="text/javascript"></script>
     <script>
-        // 你的合约地址
+        // あなたのコントラクトアドレス
         const contractAddress = "0x7e5B0BCd1a39E40C2fa4e256b4e62Ca923FCFD7A";
 
-        // 假设的合约 ABI
+        // 仮のコントラクト ABI
         const contractABI = [
             {
                 "inputs": [],
@@ -31,7 +30,7 @@
         let provider;
         let contract;
 
-        // 连接钱包函数
+        // ウォレット接続関数
         async function connectWallet() {
             if (window.ethereum) {
                 try {
@@ -42,11 +41,11 @@
                     });
                     provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
                     contract = new ethers.Contract(contractAddress, contractABI, provider);
-                    console.log("已连接到 Polygon 网络");
-                    alert("钱包已连接到 Polygon！");
+                    console.log("Polygon ネットワークに接続されました");
+                    alert("ウォレットが Polygon に接続されました！");
                 } catch (error) {
                     if (error.code === 4001) {
-                        alert("你拒绝了钱包连接请求，请授权连接后再试！");
+                        alert("ウォレット接続リクエストを拒否しました。接続を許可してから再試行してください！");
                     } else if (error.code === 4902) {
                         try {
                             await window.ethereum.request({
@@ -61,40 +60,41 @@
                             });
                             provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
                             contract = new ethers.Contract(contractAddress, contractABI, provider);
-                            alert("Polygon 网络已添加并连接！");
+                            alert("Polygon ネットワークが追加され、接続されました！");
                         } catch (addError) {
-                            console.error("添加 Polygon 网络失败:", addError);
-                            alert("添加 Polygon 网络失败");
+                            console.error("Polygon ネットワークの追加に失敗しました:", addError);
+                            alert("Polygon ネットワークの追加に失敗しました");
                         }
                     } else {
-                        console.error("连接钱包或切换网络失败:", error);
-                        alert("连接失败，请检查 MetaMask 和网络");
+                        console.error("ウォレット接続またはネットワーク切り替えに失敗しました:", error);
+                        alert("接続に失敗しました。MetaMask とネットワークを確認してください");
                     }
                 }
             } else {
-                alert("请安装 MetaMask！");
+                alert("MetaMask をインストールしてください！");
             }
         }
 
-        // 调用 sayHello 函数
+        // sayHello 関数を呼び出す
         async function callHello() {
             if (!contract) {
-                alert("请先连接钱包！");
+                alert("先にウォレットを接続してください！");
                 return;
             }
             try {
                 const result = await contract.sayHello();
                 document.getElementById("result").innerText = result;
-                console.log("合约返回:", result);
+                console.log("コントラクトの返結果:", result);
             } catch (error) {
-                console.error("调用失败:", error);
-                alert("调用失败，可能是 ABI 不匹配或网络问题");
+                console.error("呼び出しに失敗しました:", error);
+                alert("呼び出しに失敗しました。ABI が一致しないか、ネットワークの問題かもしれません");
             }
         }
 
-        // 绑定按钮事件
+        // ボタンイベントをバインド
         document.getElementById("connectButton").addEventListener("click", connectWallet);
         document.getElementById("callButton").addEventListener("click", callHello);
     </script>
+
 </body>
 </html>
