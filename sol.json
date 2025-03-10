@@ -1,1 +1,16 @@
-123
+{
+  "name": "Rocket Duck",
+  "symbol": "RDK",
+  "description": "火箭鸭是一个高速飞行的 Solana 代币，象征着冒险与创新，准备冲向区块链的星空！",
+  "image": "https://via.placeholder.com/150/FF4500/FFFFFF?text=RDK",
+  "attributes": [
+    {
+      "trait_type": "Speed",
+      "value": "Hypersonic"
+    },
+    {
+      "trait_type": "Theme",
+      "value": "Rocket Duck"
+    }
+  ]
+}
